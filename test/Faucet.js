@@ -62,7 +62,10 @@ describe("Faucet", function () {
       faucet.address
     );
 
-    await faucet.destroyFaucet();
+    const tx = await faucet.destroyFaucet();
+    const txReceipt = await tx.wait(1);
+    const { gasUsed, effectiveGasPrice } = txReceipt;
+    const gasCost = gasUsed.mul(effectiveGasPrice);
 
     const balanceContractAfter = await faucet.provider.getBalance(
       faucet.address
@@ -71,6 +74,11 @@ describe("Faucet", function () {
     const balanceAfter = await faucet.provider.getBalance(owner.address);
 
     expect(balanceAfter.toString() > balanceBefore.toString()).to.be.true;
+
     expect(balanceContractAfter.toString()).to.equal("0");
+
+    expect(balanceContractBefore.add(balanceBefore).toString()).to.equal(
+      balanceAfter.add(gasCost).toString()
+    );
   });
 });
