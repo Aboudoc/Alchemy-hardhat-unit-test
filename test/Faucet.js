@@ -58,12 +58,19 @@ describe("Faucet", function () {
     // getBalance is a function of the Ether.js blockchain provider object
     let provider = ethers.getDefaultProvider();
     const balanceBefore = await faucet.provider.getBalance(owner.address);
-    const balanceContract = await faucet.provider.getBalance(faucet.address);
+    const balanceContractBefore = await faucet.provider.getBalance(
+      faucet.address
+    );
 
     await faucet.destroyFaucet();
+
+    const balanceContractAfter = await faucet.provider.getBalance(
+      faucet.address
+    );
 
     const balanceAfter = await faucet.provider.getBalance(owner.address);
 
     expect(balanceAfter.toString() > balanceBefore.toString()).to.be.true;
+    expect(balanceContractAfter.toString()).to.equal("0");
   });
 });
